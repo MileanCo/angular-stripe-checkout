@@ -44,9 +44,9 @@ angular.module(MODULE_NAME,[])
   .provider('StripeCheckout',StripeCheckoutProvider);
 
 
-StripeCheckoutDirective.$inject = ['$parse', 'StripeCheckout'];
+StripeCheckoutDirective.$inject = ['$parse', '$timeout', 'StripeCheckout'];
 
-function StripeCheckoutDirective($parse, StripeCheckout) {
+function StripeCheckoutDirective($parse, $timeout, StripeCheckout) {
   return { link: link };
 
   function link(scope, el, attrs) {
@@ -54,7 +54,10 @@ function StripeCheckoutDirective($parse, StripeCheckout) {
 
     StripeCheckout.load()
       .then(function() {
-        handler = StripeCheckout.configure(getOptions(el));
+        // $timeout FIXES bug to load in StripePublishableKey from controller $scope
+        $timeout(function() {
+          handler = StripeCheckout.configure(getOptions(el));
+        }, 50);
       });
 
     el.on('click',function() {
